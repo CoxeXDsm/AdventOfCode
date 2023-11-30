@@ -11,7 +11,14 @@ function part1(){
 }
 
 function part2(){
-    console.log('Solution 2:');
+  let char = 0;
+  let floor = 0
+  for (let x = 1; x < instructions.length; x++){
+    char = x;
+    floor = instructions.charAt(x-1) == '(' ? floor+1 : floor-1 ;
+    if (floor == -1) break;
+  }
+  console.log('Solution 2: ' + char);
 }
 
 part1();
