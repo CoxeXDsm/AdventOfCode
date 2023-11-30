@@ -21,5 +21,5 @@ function part2(){
   console.log('Solution 2: ' + char);
 }
 
-part1();
-part2();
+// execute the parts
+part1(); part2();
