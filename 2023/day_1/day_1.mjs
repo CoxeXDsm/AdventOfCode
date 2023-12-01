@@ -37,39 +37,34 @@ function part2(){
       return c >= '0' && c <= '9';
     }
 
-    function replaceStrNumbers(str){
+    function convertNumbersArray(str){
       const numbersMap = new Map([
         ['zero', '0'], ['one', '1'], ['two', '2'], ['three', '3'], ['four', '4'],
         ['five', '5'], ['six', '6'], ['seven', '7'], ['eight', '8'], ['nine', '9']
       ]);
 
-      for (let entry of numbersMap){
-        let regexp = new RegExp(entry[0], "gi");
-        str = str.replaceAll(regexp, entry[1]);
+      let numbersArray = [];
+      
+      for (let idx = 0; idx < str.length; idx++){
+        if (isCharNumber(str[idx])){
+          numbersArray.push(str[idx]);
+        } else {
+            for (let entry of numbersMap){
+              if (str.substring(idx).startsWith(entry[0])){
+                numbersArray.push(entry[1]);
+                break;
+              }
+            }
+        }
       }
-
-      return str;
+      return numbersArray;
     }
 
     let result = calibration.reduce((acc, curr) => {
       let combination = '';
-      let reformat = replaceStrNumbers(curr);
+      let numbersArray = convertNumbersArray(curr);
 
-      console.log(reformat);
-
-      for (let x = 0; x < reformat.length; x++){
-        if(isCharNumber(reformat.charAt(x))){
-          combination += reformat.charAt(x);
-          break;
-        }
-      }
-
-      for (let x = reformat.length; x >= 0; x--){
-        if(isCharNumber(reformat.charAt(x))){
-          combination += reformat.charAt(x);
-          break;
-        }
-      }
+      combination = numbersArray[0] + numbersArray[numbersArray.length-1];
       
       return acc + Number(combination);
     }, 0)
