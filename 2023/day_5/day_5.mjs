@@ -34,46 +34,55 @@ function part1(){
 }
 
 function part2(){
-    function transform(seed, mapTrans){
-        for (let i = 0; i < mapTrans.length; i++){
-            if(seed >= Number(mapTrans[i][1]) && seed < (Number(mapTrans[i][1])+Number(mapTrans[i][2]))){
-                let diff = seed - Number(mapTrans[i][1]);
-                return Number(mapTrans[i][0]) + diff;
+    const seeds = map[0].split(": ")[1].split(" ").map(x => parseInt(x)).reduce((a, x, i) => {
+        if (i % 2 == 0) a.push([]);
+        return a[a.length - 1].push(x), a;
+    }, []);
+
+    const maps = map.slice(1).map(x => x.split("\n").slice(1).map(y => y.split(" ").map(z => parseInt(z))));
+    const resultArray = [];
+
+    function expand(index, values) {
+        if (index == maps.length) return [values];
+    
+        const result = [];
+        for (const [destination, source, range] of maps[index]) {
+            if (values[0] < source && values[0] + values[1] > source && values[0] + values[1] <= source + range) {
+                const firstTuple = [values[0], source - values[0]];
+                const lastTuple = [destination, values[1] - source + values[0]];
+                result.push(...expand(index + 1, lastTuple), ...expand(index, firstTuple));
+                break;
+            }
+            else if (values[0] >= source && values[0] < source + range && values[0] + values[1] > source + range) {
+                const firstTuple = [destination + values[0] - source, source + range - values[0]];
+                const lastTuple = [source + range, values[0] + values[1] - source - range];
+                result.push(...expand(index + 1, firstTuple), ...expand(index, lastTuple));
+                break;
+            }
+            else if (values[0] >= source && values[0] + values[1] <= source + range) {
+                result.push(...expand(index + 1, [destination + values[0] - source, values[1]]));
+                break;
+            }
+            else if (values[0] < source && values[0] + values[1] > source + range) {
+                const firstTuple = [values[0], source - values[0]];
+                const middleTuple = [destination, range];
+                const lastTuple = [source + range, values[0] + values[1] - source - range];
+                result.push(...expand(index, lastTuple), ...expand(index + 1, middleTuple), ...expand(index, firstTuple));
+                break;
             }
         }
-        return seed;
+    
+        if (result.length == 0) result.push(...expand(index + 1, values));
+        return result;
     }
 
-    let parts = map.map(x => x.split(/\n/g));
-    let seeds = parts[0][0].split(' ');
-    seeds.shift();
-
-    let result = -1;
-
-    for(let x = 0; x < seeds.length; x+=2){
-        for (let y = 0; y < Number(seeds[x+1]); y++){
-            let aux = Number(seeds[x])+y;
-            for (let x = 1; x < parts.length; x++){
-                let transformMap = [...parts[x]];
-                let byPass = transformMap.shift();
-                transformMap = transformMap.map(e => e.split(' '));
-
-                aux = transform(aux, transformMap);
-            }
-            result = result == -1 ? aux : Math.min(result,aux);
-        }
+    for (const seed of seeds) {
+        resultArray.push(expand(0, seed));
     }
+
+    let result = Math.min(...resultArray.flat().map(x => x[0]))
 
     console.log('Solution 2: ' + result);
-
-    /*
-    for(let x = 0; x < seeds.length; x+=2){
-                    for (let y = 0; y < Number(seeds[x+1]); y++){
-                        aux.push(Number(seeds[x]+y));
-                        let aux = transform(Number(seeds[x]+y), transformMap);
-                    }
-                }
-    */
 }
 
 // execute the parts
