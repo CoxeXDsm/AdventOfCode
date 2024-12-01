@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-let mirrors = readFileSync("day_13/day_13.txt", { encoding: "utf-8" }) // read day_??.txt content
+let mirrors = readFileSync("2023\\day_13\\day_13.txt", { encoding: "utf-8" }) // read day_??.txt content
   .replace(/\r/g, "") // remove all \r characters to avoid issues on Windows
   .trim()
   .split(/\n\n/g)
